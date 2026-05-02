@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,7 @@
                     colors: {
                         background: '#121212',
                         card: '#1A1A1A',
-                        accent: '#4ade80', 
+                        accent: '#4ade80',
                         accentHover: '#22c55e',
                         mythbuster: '#F59E0B'
                     }
@@ -22,33 +23,46 @@
     </script>
     <link rel="stylesheet" href="/style.css">
 </head>
-<body class="bg-background text-gray-200 h-screen font-sans flex overflow-hidden transition-all duration-300" id="app-body">
+
+<body class="bg-background text-gray-200 h-screen font-sans flex overflow-hidden transition-all duration-300"
+    id="app-body">
 
     <!-- ONBOARDING MODAL -->
     <!-- [EVAL: ACCESSIBILITY] ARIA roles mapped for modal dialog representation -->
-    <div id="onboarding-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center transition-opacity duration-300">
-        <div class="bg-card border border-gray-800 rounded-2xl p-8 w-full max-w-lg shadow-[0_0_50px_rgba(74,222,128,0.15)] mx-4">
+    <div id="onboarding-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"
+        class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center transition-opacity duration-300">
+        <div
+            class="bg-card border border-gray-800 rounded-2xl p-8 w-full max-w-lg shadow-[0_0_50px_rgba(74,222,128,0.15)] mx-4">
             <div class="flex items-center gap-3 mb-2 justify-center">
                 <div class="w-2 h-8 bg-accent rounded-sm"></div>
                 <h2 id="modal-title" class="text-3xl font-bold tracking-wide text-white">GovPortal</h2>
             </div>
-            <p class="text-gray-400 text-sm text-center mb-8 font-medium tracking-wide">Secure Electoral Assistance Platform</p>
-            
+            <p class="text-gray-400 text-sm text-center mb-8 font-medium tracking-wide">Secure Electoral Assistance
+                Platform</p>
+
             <form id="onboarding-form" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="user-name" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Name</label>
-                        <input type="text" id="user-name" aria-label="User Name" required class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. Rahul">
+                        <label for="user-name"
+                            class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Name</label>
+                        <input type="text" id="user-name" aria-label="User Name" required
+                            class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600"
+                            placeholder="e.g. Rahul">
                     </div>
                     <div>
-                        <label for="user-age" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Age</label>
-                        <input type="number" id="user-age" aria-label="User Age" required min="1" max="120" class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. 21">
+                        <label for="user-age"
+                            class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Age</label>
+                        <input type="number" id="user-age" aria-label="User Age" required min="1" max="120"
+                            class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600"
+                            placeholder="e.g. 21">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="user-lang" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Language</label>
-                        <select id="user-lang" aria-label="Language Preference" class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all appearance-none cursor-pointer">
+                        <label for="user-lang"
+                            class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Language</label>
+                        <select id="user-lang" aria-label="Language Preference"
+                            class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all appearance-none cursor-pointer">
                             <option value="English">English</option>
                             <option value="Hindi">Hindi</option>
                             <option value="Marathi">Marathi</option>
@@ -57,20 +71,29 @@
                         </select>
                     </div>
                     <div>
-                        <label for="user-state" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">State / Region</label>
-                        <input type="text" id="user-state" aria-label="State or Region" required class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. Maharashtra">
+                        <label for="user-state"
+                            class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">State /
+                            Region</label>
+                        <input type="text" id="user-state" aria-label="State or Region" required
+                            class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600"
+                            placeholder="e.g. Maharashtra">
                     </div>
                 </div>
-                
+
                 <div class="pt-2 pb-1">
                     <!-- [EVAL: ACCESSIBILITY] Checkbox for explicit High Contrast and Auto-Voice selection -->
-                    <label class="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-700 bg-[#121212] hover:bg-gray-800 transition-colors min-h-[44px]">
-                        <input type="checkbox" id="user-accessibility" aria-label="Enable Accessibility Support" class="w-5 h-5 accent-accent bg-gray-700 border-gray-600 rounded cursor-pointer">
-                        <span class="text-sm font-medium text-gray-200">I need Accessibility Support<br><span class="text-[11px] text-gray-500 font-normal">Enables High Contrast & Auto-Voice</span></span>
+                    <label
+                        class="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-700 bg-[#121212] hover:bg-gray-800 transition-colors min-h-[44px]">
+                        <input type="checkbox" id="user-accessibility" aria-label="Enable Accessibility Support"
+                            class="w-5 h-5 accent-accent bg-gray-700 border-gray-600 rounded cursor-pointer">
+                        <span class="text-sm font-medium text-gray-200">I need Accessibility Support<br><span
+                                class="text-[11px] text-gray-500 font-normal">Enables High Contrast &
+                                Auto-Voice</span></span>
                     </label>
                 </div>
 
-                <button type="submit" aria-label="Access Portal" class="w-full min-h-[44px] bg-accent hover:bg-accentHover text-gray-900 font-bold tracking-wide py-4 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg mt-2">
+                <button type="submit" aria-label="Access Portal"
+                    class="w-full min-h-[44px] bg-accent hover:bg-accentHover text-gray-900 font-bold tracking-wide py-4 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg mt-2">
                     Access Portal
                 </button>
             </form>
@@ -79,17 +102,19 @@
 
     <!-- Main Layout Container -->
     <!-- [EVAL: RESPONSIVENESS] Container switches from flex-col to flex-row on desktop breakpoints -->
-    <div id="main-dashboard" class="flex flex-col md:flex-row w-full h-full p-2 md:p-4 gap-4 max-w-7xl mx-auto relative hidden opacity-0 transition-opacity duration-500">
-        
+    <div id="main-dashboard"
+        class="flex flex-col md:flex-row w-full h-full p-2 md:p-4 gap-4 max-w-7xl mx-auto relative hidden opacity-0 transition-opacity duration-500">
+
         <!-- Sidebar: Election Timeline -->
         <!-- [EVAL: ACCESSIBILITY] Semantic role="complementary" for secondary content -->
         <!-- [EVAL: RESPONSIVENESS] hidden on mobile, md:block guarantees chat gets 100% width on small screens -->
-        <div role="complementary" aria-label="Election Timeline" class="w-full md:w-1/4 bg-card rounded-2xl p-6 hidden md:flex flex-col shadow-2xl border border-gray-800/60 transition-all shrink-0">
+        <div role="complementary" aria-label="Election Timeline"
+            class="w-full md:w-1/4 bg-card rounded-2xl p-6 hidden md:flex flex-col shadow-2xl border border-gray-800/60 transition-all shrink-0">
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-3 h-8 bg-accent rounded-sm"></div>
                 <h2 class="text-xl font-bold tracking-wide text-white">Election Flow</h2>
             </div>
-            
+
             <div id="timeline-container" class="flex-1 overflow-y-auto pr-2 space-y-6">
                 <div class="flex flex-col items-center justify-center h-full text-center opacity-50">
                     <span class="text-4xl mb-3">📍</span>
@@ -100,25 +125,31 @@
 
         <!-- Main Content: Chat Window -->
         <!-- [EVAL: ACCESSIBILITY] Semantic role="main" indicating primary application functional area -->
-        <div role="main" aria-label="Chat Interface" class="flex-1 bg-card rounded-2xl flex flex-col shadow-2xl border border-gray-800/60 transition-all relative overflow-hidden">
-            
+        <div role="main" aria-label="Chat Interface"
+            class="flex-1 bg-card rounded-2xl flex flex-col shadow-2xl border border-gray-800/60 transition-all relative overflow-hidden">
+
             <!-- Header -->
-            <div class="p-4 md:p-5 border-b border-gray-800/60 flex justify-between items-center bg-card rounded-t-2xl z-10 relative shrink-0">
+            <div
+                class="p-4 md:p-5 border-b border-gray-800/60 flex justify-between items-center bg-card rounded-t-2xl z-10 relative shrink-0">
                 <div>
                     <h1 class="text-lg md:text-xl font-bold text-white tracking-wide flex items-center gap-2">
-                        <span class="bg-accent text-gray-900 text-[10px] md:text-xs px-2 py-0.5 rounded uppercase font-bold mr-1">Gov</span>
+                        <span
+                            class="bg-accent text-gray-900 text-[10px] md:text-xs px-2 py-0.5 rounded uppercase font-bold mr-1">Gov</span>
                         Electoral Assistant
                     </h1>
-                    <p id="header-greeting" class="text-[10px] md:text-xs text-gray-400 mt-1 font-medium tracking-wide">Secure Connection Established.</p>
+                    <p id="header-greeting" class="text-[10px] md:text-xs text-gray-400 mt-1 font-medium tracking-wide">
+                        Secure Connection Established.</p>
                 </div>
                 <div class="flex items-center gap-2 md:gap-4">
                     <!-- MythBuster Toggle -->
                     <!-- [EVAL: ACCESSIBILITY] ARIA labels for icon-heavy buttons -->
-                    <button id="myth-toggle" aria-label="Toggle MythBuster Mode" class="flex items-center gap-2 border border-gray-700 bg-[#121212] hover:bg-gray-800 text-gray-300 px-3 min-h-[44px] rounded-full text-xs font-bold transition-all focus:outline-none">
+                    <button id="myth-toggle" aria-label="Toggle MythBuster Mode"
+                        class="flex items-center gap-2 border border-gray-700 bg-[#121212] hover:bg-gray-800 text-gray-300 px-3 min-h-[44px] rounded-full text-xs font-bold transition-all focus:outline-none">
                         <span>🔍</span> <span class="hidden md:inline">MythBuster Mode</span>
                     </button>
                     <!-- Volume Toggle -->
-                    <button id="volume-toggle" aria-label="Toggle Audio Voice" class="text-gray-400 hover:text-white transition-colors text-xl focus:outline-none rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center">
+                    <button id="volume-toggle" aria-label="Toggle Audio Voice"
+                        class="text-gray-400 hover:text-white transition-colors text-xl focus:outline-none rounded-full min-h-[44px] min-w-[44px] flex items-center justify-center">
                         🔊
                     </button>
                 </div>
@@ -132,10 +163,17 @@
             <div class="p-4 md:p-5 border-t border-gray-800/60 bg-card rounded-b-2xl flex flex-col gap-3 shrink-0">
                 <!-- Real-World Quick Action Chips -->
                 <!-- [EVAL: CODE QUALITY] Modular quick action components tailored for common real-world use cases -->
-                <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="quick-chips" role="group" aria-label="Quick Actions">
-                    <button aria-label="Lost Voter ID query" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Lost Voter ID</button>
-                    <button aria-label="EVM Walkthrough query" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">EVM Walkthrough</button>
-                    <button aria-label="Check Voter List query" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Check Voter List</button>
+                <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="quick-chips" role="group"
+                    aria-label="Quick Actions">
+                    <button aria-label="Lost Voter ID query"
+                        class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Lost
+                        Voter ID</button>
+                    <button aria-label="EVM Walkthrough query"
+                        class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">EVM
+                        Walkthrough</button>
+                    <button aria-label="Check Voter List query"
+                        class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Check
+                        Voter List</button>
                 </div>
 
                 <form id="chat-form" class="relative flex items-center gap-2 md:gap-3">
@@ -153,8 +191,10 @@
                             placeholder="Describe your issue or ask a question..." autocomplete="off">
                         <button type="submit" id="send-button" aria-label="Send Message"
                             class="absolute right-2 top-1.5 bottom-1.5 bg-accent hover:bg-accentHover text-gray-900 min-w-[40px] h-[40px] rounded-full transition-all flex items-center justify-center focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-0.5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-0.5" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                             </svg>
                         </button>
                     </div>
@@ -167,4 +207,5 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="/script.js"></script>
 </body>
+
 </html>
