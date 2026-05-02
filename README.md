@@ -7,8 +7,7 @@
 
 > An inclusive, context-aware AI dashboard designed to demystify the electoral process for citizens using voice accessibility, structured data, and multilingual support.
 
-*Insert a Screenshot of your UI here*
-`![Dashboard Screenshot demonstrating the UI and Accessibility Features](./screenshot.png)`
+![Dashboard Screenshot demonstrating the UI and Accessibility Features](./screenshot.png)
 
 ---
 
