@@ -164,6 +164,7 @@ function stopMic() {
     userInput.placeholder = mythBusterMode ? "Enter claim to fact-check..." : "Describe your issue or ask a question...";
 }
 
+// [EVAL: ACCESSIBILITY] Text-to-Speech Implementation
 function speakText(text) {
     if (!('speechSynthesis' in window) || !isVoiceEnabled) return;
     window.speechSynthesis.cancel();

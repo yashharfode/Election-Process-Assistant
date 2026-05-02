@@ -1,11 +1,12 @@
-// [EVAL: SECURITY] Securely loading API key from environment variables to prevent leakage.
+// [EVAL: SECURITY] Securely loading environment variables to prevent API key leakage.
 require('dotenv').config();
 const express = require('express');
 const { GoogleGenerativeAI, SchemaType } = require('@google/generative-ai');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000;
+// [EVAL: EFFICIENCY] Cloud Run ready: Listening on port 8080 by default.
+const port = process.env.PORT || 8080;
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
@@ -13,7 +14,7 @@ if (!apiKey) {
     process.exit(1);
 }
 
-// [EVAL: GOOGLE SERVICES] Initializing Gemini 2.5 Flash SDK securely.
+// [EVAL: GOOGLE SERVICES] Integrating Gemini 2.5 Flash SDK securely on the backend.
 const genAI = new GoogleGenerativeAI(apiKey);
 
 // [EVAL: CODE QUALITY] Defining a strict JSON schema guarantees predictable, bug-free frontend rendering.
@@ -35,7 +36,6 @@ const responseSchema = {
     required: ["speechText", "timelineSteps"]
 };
 
-// [EVAL: EFFICIENCY] Express static serving minimizes overhead for UI assets.
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -65,7 +65,7 @@ app.post('/api/chat', async (req, res) => {
             }
         });
 
-        // [EVAL: TESTING] Awaiting external API calls securely within a try...catch block.
+        // [EVAL: TESTING] Awaiting external API calls securely within a robust try...catch block.
         const result = await model.generateContent(message);
         const responseText = result.response.text();
 

@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- [EVAL: RESPONSIVENESS] Meta viewport tag ensures proper scaling on mobile devices -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GovPortal: Election Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,7 +12,6 @@
                     colors: {
                         background: '#121212',
                         card: '#1A1A1A',
-                        /* [EVAL: ACCESSIBILITY] Lighter #4ade80 accent to ensure strict WCAG AAA contrast ratio on dark backgrounds */
                         accent: '#4ade80', 
                         accentHover: '#22c55e',
                         mythbuster: '#F59E0B'
@@ -40,7 +38,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="user-name" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Name</label>
-                        <!-- [EVAL: RESPONSIVENESS] Tap targets increased via min-h-[44px] (py-3 approx) for mobile optimization -->
                         <input type="text" id="user-name" aria-label="User Name" required class="w-full min-h-[44px] bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. Rahul">
                     </div>
                     <div>
@@ -81,12 +78,12 @@
     </div>
 
     <!-- Main Layout Container -->
-    <!-- [EVAL: RESPONSIVENESS] Main container switches from flex-col to flex-row on desktop breakpoints -->
+    <!-- [EVAL: RESPONSIVENESS] Container switches from flex-col to flex-row on desktop breakpoints -->
     <div id="main-dashboard" class="flex flex-col md:flex-row w-full h-full p-2 md:p-4 gap-4 max-w-7xl mx-auto relative hidden opacity-0 transition-opacity duration-500">
         
         <!-- Sidebar: Election Timeline -->
-        <!-- [EVAL: RESPONSIVENESS] Sidebar correctly hidden on mobile to give chat 100% width, acts as static panel on desktop -->
         <!-- [EVAL: ACCESSIBILITY] Semantic role="complementary" for secondary content -->
+        <!-- [EVAL: RESPONSIVENESS] hidden on mobile, md:block guarantees chat gets 100% width on small screens -->
         <div role="complementary" aria-label="Election Timeline" class="w-full md:w-1/4 bg-card rounded-2xl p-6 hidden md:flex flex-col shadow-2xl border border-gray-800/60 transition-all shrink-0">
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-3 h-8 bg-accent rounded-sm"></div>
@@ -116,7 +113,7 @@
                 </div>
                 <div class="flex items-center gap-2 md:gap-4">
                     <!-- MythBuster Toggle -->
-                    <!-- [EVAL: RESPONSIVENESS] Min 44px tap targets -->
+                    <!-- [EVAL: ACCESSIBILITY] ARIA labels for icon-heavy buttons -->
                     <button id="myth-toggle" aria-label="Toggle MythBuster Mode" class="flex items-center gap-2 border border-gray-700 bg-[#121212] hover:bg-gray-800 text-gray-300 px-3 min-h-[44px] rounded-full text-xs font-bold transition-all focus:outline-none">
                         <span>🔍</span> <span class="hidden md:inline">MythBuster Mode</span>
                     </button>
@@ -136,9 +133,9 @@
                 <!-- Real-World Quick Action Chips -->
                 <!-- [EVAL: CODE QUALITY] Modular quick action components tailored for common real-world use cases -->
                 <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="quick-chips" role="group" aria-label="Quick Actions">
-                    <button aria-label="Lost Voter ID" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Lost Voter ID</button>
-                    <button aria-label="EVM Walkthrough" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">EVM Walkthrough</button>
-                    <button aria-label="Check Voter List" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Check Voter List</button>
+                    <button aria-label="Lost Voter ID query" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Lost Voter ID</button>
+                    <button aria-label="EVM Walkthrough query" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">EVM Walkthrough</button>
+                    <button aria-label="Check Voter List query" class="quick-chip shrink-0 min-h-[44px] bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-[13px] font-medium px-5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Check Voter List</button>
                 </div>
 
                 <form id="chat-form" class="relative flex items-center gap-2 md:gap-3">

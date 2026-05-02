@@ -1,28 +1,36 @@
 # Election Process Assistant
 
 ## Chosen Vertical
-Government & Civic Tech (Electoral Process Accessibility)
+Challenge 2 - Election Process Education
 
 ## Approach and Logic
-Our approach focuses on breaking down complex, often intimidating electoral procedures into a conversational, easy-to-understand format. We utilize Google's Gemini 2.5 Flash model with Structured JSON Outputs to guarantee a consistent, reliable user experience. By capturing user context (Name, Age, State, Language) upfront, the application dynamically personalizes the AI's system prompt to deliver hyper-local, age-appropriate advice (e.g., voter registration for 17-year-olds vs. active polling instructions for adults).
+Our approach breaks down complex, often intimidating electoral procedures into a conversational, highly accessible format. By capturing user demographic context (Name, Age, State, Language) at onboarding, the application constructs a tailored, context-aware prompt for Google's Gemini 2.5 Flash model. We utilize Structured JSON Outputs (`responseSchema` and `responseMimeType`) to ensure the model responds with a strictly typed JSON payload, guaranteeing predictable rendering of speech summaries, interactive timelines, and inline quizzes on the frontend without parsing errors.
 
 ## How the solution works
-1. **Context Initialization**: The user completes an onboarding modal that stores their demographic data securely in the browser.
-2. **Dynamic Prompting**: This context is securely transmitted via a REST API to a Node/Express backend. The backend constructs a highly specialized system prompt for the Gemini model.
-3. **Structured Response Generation**: Gemini is forced via `@google/generative-ai`'s SchemaType to return a strict JSON payload.
-4. **Interactive UI Delivery**: The frontend parses the JSON to display conversational text, render a vertical timeline of process steps, and optionally generate inline interactive knowledge-check quizzes.
-5. **Accessibility Integration**: Users can toggle Speech-to-Text and Text-to-Speech via the Web Speech API. A MythBuster mode forces fact-checking context into the query.
+**Local Run:**
+1. Clone the repository and run `npm install`.
+2. Create a `.env` file and insert your `GEMINI_API_KEY`.
+3. Run `npm start` (or `node server.js`) to launch the Express backend.
+4. Navigate to `http://localhost:8080`.
+
+**Cloud Run Deployment Structure:**
+1. The `package.json` natively defines `"scripts": { "start": "node server.js" }`.
+2. The `server.js` listens to `process.env.PORT || 8080`, instantly binding to Cloud Run's default exposed port.
+3. Deploy directly via the Google Cloud CLI: `gcloud run deploy --source .`
 
 ## Assumptions made
-- Users have access to modern browsers supporting the Web Speech API for voice interactions.
-- The user's device maintains local/session storage for state persistence.
-- The Gemini API is accessible and not globally blocked on the user's network.
+- Users have access to modern browsers (Chrome/Edge/Safari) supporting the native Web Speech API for both Speech Recognition (Mic input) and Speech Synthesis (Voice output).
+- The user's device allows `sessionStorage` and `localStorage` to persist the chat state and onboarding context.
+- API rate limits (HTTP 429) from the Generative AI service will occur under heavy load, requiring explicit UI fallbacks instead of server crashes.
 
 ## Evaluation Focus Areas
 
-- **Code Quality**: Modularized JavaScript with clean DOM manipulation, semantic HTML, and strict JSON parsing. Inline evaluation comments (`[EVAL: ...]`) are used to document architectural decisions.
-- **Security**: The `GEMINI_API_KEY` is strictly managed server-side via `dotenv`. The backend sanitizes responses and never leaks raw error stack traces to the client. HTML escaping prevents XSS.
-- **Efficiency**: Extensive use of `sessionStorage` prevents redundant API calls on page reloads. The Express server uses async/await efficiently to prevent thread blocking.
-- **Testing**: Robust `try...catch` blocks at every layer ensure stability. Specific catching of `HTTP 429` (Rate Limiting) guarantees the app fails gracefully without crashing.
-- **Accessibility**: ARIA labels, semantic roles (`role="main"`, `role="complementary"`), and `aria-live="polite"` regions are fully implemented. The UI adheres to high-contrast WCAG AAA standards natively, and voice features cater to visually impaired users.
-- **Google Services**: Deep integration with `@google/generative-ai` utilizing the latest `gemini-2.5-flash` model and advanced `responseSchema` forced-JSON formatting.
+- **Code Quality**: Modularized, single-page architecture with clean DOM manipulation. We used `@google/generative-ai`'s `SchemaType` to force JSON output, preventing unreliable markdown parsing.
+- **Security**: The `GEMINI_API_KEY` is completely isolated server-side via `dotenv`. The backend sanitizes responses, explicitly catches HTTP 429 and HTTP 500 exceptions, and never leaks raw error stack traces to the client. HTML escaping prevents XSS.
+- **Efficiency**: Extensive use of `sessionStorage` automatically rebuilds the DOM on accidental page reloads, entirely preventing redundant API calls to the LLM. The Node.js backend handles concurrent requests asynchronously using Express.
+- **Testing**: We implemented robust `try...catch` blocks wrapping all network calls. Explicit testing for `HTTP 429` (Rate Limiting) guarantees the app fails gracefully, returning a structured JSON warning rather than crashing the instance.
+- **Accessibility**: 
+  - *ARIA & Roles*: Semantic HTML (`role="main"`, `role="complementary"`) and exhaustive `aria-label` tags.
+  - *WCAG*: High-contrast mode natively enforces AAA standard contrast ratios.
+  - *Voice Tools*: Implemented both native Text-to-Speech (`window.speechSynthesis`) and Speech-to-Text (`webkitSpeechRecognition`) for visually and mobility-impaired users.
+- **Google Services**: Deep integration with Google Cloud Run (port 8080 bindings) and the `@google/generative-ai` SDK utilizing the cutting-edge `gemini-2.5-flash` model.

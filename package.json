@@ -1,26 +1,17 @@
 {
   "name": "election-process-assistant",
   "version": "1.0.0",
-  "description": "For Hackathon",
-  "main": "index.js",
+  "description": "Context-Aware Election Process Assistant deployed on Google Cloud Run",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yashharfode/Election-Process-Assistant.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/yashharfode/Election-Process-Assistant/issues"
-  },
-  "homepage": "https://github.com/yashharfode/Election-Process-Assistant#readme",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
