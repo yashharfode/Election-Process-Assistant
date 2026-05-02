@@ -1,21 +1,91 @@
+// UI Elements
+const onboardingModal = document.getElementById('onboarding-modal');
+const onboardingForm = document.getElementById('onboarding-form');
+const mainDashboard = document.getElementById('main-dashboard');
+const headerGreeting = document.getElementById('header-greeting');
 const chatForm = document.getElementById('chat-form');
 const userInput = document.getElementById('user-input');
 const chatContainer = document.getElementById('chat-container');
 const sendButton = document.getElementById('send-button');
 const micButton = document.getElementById('mic-button');
-
+const volumeToggle = document.getElementById('volume-toggle');
 const timelineContainer = document.getElementById('timeline-container');
-const quizContainer = document.getElementById('quiz-container');
-const closeQuizBtn = document.getElementById('close-quiz');
+const quickChips = document.querySelectorAll('.quick-chip');
 
-// Web Speech API Initialization (Speech-to-Text)
+// Global State
+let userContext = { name: '', age: '', language: 'English' };
+let isVoiceEnabled = true;
+
+// 1. ONBOARDING MODAL LOGIC
+window.addEventListener('DOMContentLoaded', () => {
+    const savedName = localStorage.getItem('elec_name');
+    const savedAge = localStorage.getItem('elec_age');
+    const savedLang = localStorage.getItem('elec_lang');
+
+    if (savedName && savedAge && savedLang) {
+        userContext = { name: savedName, age: savedAge, language: savedLang };
+        hideModalAndShowDashboard();
+    }
+});
+
+onboardingForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    userContext.name = document.getElementById('user-name').value.trim();
+    userContext.age = document.getElementById('user-age').value.trim();
+    userContext.language = document.getElementById('user-lang').value;
+
+    localStorage.setItem('elec_name', userContext.name);
+    localStorage.setItem('elec_age', userContext.age);
+    localStorage.setItem('elec_lang', userContext.language);
+
+    hideModalAndShowDashboard();
+});
+
+function hideModalAndShowDashboard() {
+    onboardingModal.classList.add('opacity-0');
+    setTimeout(() => {
+        onboardingModal.classList.add('hidden');
+        mainDashboard.classList.remove('hidden');
+        // Trigger reflow for transition
+        void mainDashboard.offsetWidth;
+        mainDashboard.classList.remove('opacity-0');
+        
+        headerGreeting.innerText = `Ask me anything about electoral procedures.`;
+        
+        // Initial greeting
+        const greeting = `Hello ${userContext.name}! I am ready to assist you in ${userContext.language}. How can I help you with the election process today?`;
+        appendMessage(greeting, 'ai');
+        if (isVoiceEnabled) speakText(greeting);
+
+    }, 300);
+}
+
+// 2. VOICE TOGGLE LOGIC
+volumeToggle.addEventListener('click', () => {
+    isVoiceEnabled = !isVoiceEnabled;
+    volumeToggle.innerText = isVoiceEnabled ? '🔊' : '🔇';
+    volumeToggle.title = isVoiceEnabled ? 'Disable Voice' : 'Enable Voice';
+    if (!isVoiceEnabled && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+});
+
+// 3. QUICK CHIPS LOGIC
+quickChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+        userInput.value = chip.innerText;
+        // Trigger submit
+        chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
+    });
+});
+
+// Web Speech API (Speech-to-Text)
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition;
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.continuous = false;
-    recognition.lang = 'en-US';
     recognition.interimResults = false;
 
     recognition.onstart = () => {
@@ -47,6 +117,8 @@ micButton.addEventListener('click', () => {
     if (micButton.classList.contains('recording-active')) {
         recognition.stop();
     } else {
+        const langMap = { 'English': 'en-IN', 'Hindi': 'hi-IN', 'Marathi': 'mr-IN', 'Tamil': 'ta-IN', 'Kannada': 'kn-IN' };
+        recognition.lang = langMap[userContext.language] || 'en-US';
         recognition.start();
     }
 });
@@ -56,59 +128,41 @@ function stopMic() {
     userInput.placeholder = "Type your message here...";
 }
 
-// Text-to-Speech Helper (SpeechSynthesis)
+// Text-to-Speech (SpeechSynthesis)
 function speakText(text) {
-    if (!('speechSynthesis' in window)) return;
-    // Stop any ongoing speech
+    if (!('speechSynthesis' in window) || !isVoiceEnabled) return;
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
+    const langMap = { 'English': 'en-IN', 'Hindi': 'hi-IN', 'Marathi': 'mr-IN', 'Tamil': 'ta-IN', 'Kannada': 'kn-IN' };
+    utterance.lang = langMap[userContext.language] || 'en-US';
     utterance.rate = 1;
-    
-    // Attempt to pick a good voice if available
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Natural'));
-    if (preferredVoice) {
-        utterance.voice = preferredVoice;
-    }
     
     window.speechSynthesis.speak(utterance);
 }
 
-closeQuizBtn.addEventListener('click', () => {
-    quizContainer.classList.add('hidden');
-});
-
+// Handle Chat Form Submission
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const message = userInput.value.trim();
     if (!message) return;
 
-    // 1. Add User Message to Chat
     appendMessage(message, 'user');
     userInput.value = '';
     
-    // Disable input while loading
     userInput.disabled = true;
     sendButton.disabled = true;
     if(micButton) micButton.disabled = true;
     
-    // Add loading indicator
     const loadingId = appendLoadingIndicator();
-    
-    // Hide quiz if there's a new question being asked
-    quizContainer.classList.add('hidden');
 
     try {
-        // 2. Send Message to Server API
         const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ message })
+            headers: { 'Content-Type': 'application/json' },
+            // Sending context with every request
+            body: JSON.stringify({ message, context: userContext })
         });
 
         const data = await response.json();
@@ -119,25 +173,23 @@ chatForm.addEventListener('submit', async (e) => {
         
         removeElement(loadingId);
         
-        // 3. Process the Structured JSON Response
-        if (data.speechText) {
-            // Read the speech summary aloud
+        if (data.speechText && isVoiceEnabled) {
             speakText(data.speechText);
-            // Also append the summary to the chat view
+        }
+
+        if (data.speechText) {
             appendMessage(data.speechText, 'ai');
         }
 
-        // 4. Render dynamic timeline if present
         if (data.timelineSteps && Array.isArray(data.timelineSteps) && data.timelineSteps.length > 0) {
             renderTimeline(data.timelineSteps);
         } else if (data.timelineSteps) {
-            // If empty array, we can choose to clear or show default text
             timelineContainer.innerHTML = '<p class="text-gray-500 text-sm italic">Ask about an election process to see the steps here.</p>';
         }
 
-        // 5. Render interactive quiz if present
+        // 4. Render Inline Quiz
         if (data.quiz && data.quiz.question) {
-            renderQuiz(data.quiz);
+            appendQuizInline(data.quiz);
         }
 
     } catch (error) {
@@ -152,6 +204,7 @@ chatForm.addEventListener('submit', async (e) => {
     }
 });
 
+// Append regular chat messages
 function appendMessage(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('flex', 'w-full', 'my-2', 'opacity-0', 'transition-opacity', 'duration-300');
@@ -177,9 +230,6 @@ function appendMessage(text, sender) {
         messageDiv.classList.add('justify-center');
         innerHtml = `
             <div class="bg-red-900/30 text-red-400 px-5 py-3 rounded-xl text-sm border border-red-800/50 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
                 <span>${escapeHtml(text)}</span>
             </div>
         `;
@@ -196,71 +246,65 @@ function appendMessage(text, sender) {
     scrollToBottom();
 }
 
-function renderTimeline(stepsArray) {
-    timelineContainer.innerHTML = ''; // Clear current timeline
-
-    stepsArray.forEach((step, index) => {
-        const isLast = index === stepsArray.length - 1;
-        
-        const stepDiv = document.createElement('div');
-        stepDiv.className = `relative pl-5 pb-4 timeline-item`;
-        stepDiv.style.animationDelay = `${index * 0.1}s`;
-        
-        // Add border-l-2 unless it's the last item to connect the dots
-        if (!isLast) {
-            stepDiv.classList.add('border-l-2', 'border-accent');
-        } else {
-            stepDiv.classList.add('border-l-2', 'border-transparent');
-        }
-
-        stepDiv.innerHTML = `
-            <div class="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-1 shadow-[0_0_8px_rgba(46,139,87,0.8)] border-2 border-card"></div>
-            <h3 class="text-sm font-semibold text-gray-200 mb-1">Step ${index + 1}</h3>
-            <p class="text-xs text-gray-400 leading-relaxed">${escapeHtml(step)}</p>
-        `;
-        
-        timelineContainer.appendChild(stepDiv);
-    });
-}
-
-function renderQuiz(quizObject) {
+// Render Inline Quiz inside the chat container
+function appendQuizInline(quizObject) {
     const { question, options, answer } = quizObject;
     if (!question || !options || !answer) return;
 
-    document.getElementById('quiz-question').innerText = question;
-    const optionsContainer = document.getElementById('quiz-options');
-    optionsContainer.innerHTML = '';
+    const quizDiv = document.createElement('div');
+    quizDiv.classList.add('flex', 'justify-start', 'w-full', 'my-3', 'opacity-0', 'transition-opacity', 'duration-300');
     
-    const feedbackDiv = document.getElementById('quiz-feedback');
-    feedbackDiv.classList.add('hidden');
-    feedbackDiv.className = 'mt-3 text-xs font-semibold p-2 rounded-md hidden';
+    const optionsId = 'quiz-opts-' + Date.now();
+    const feedbackId = 'quiz-fb-' + Date.now();
+
+    quizDiv.innerHTML = `
+        <div class="bg-[#1e1e1e] border-l-4 border-accent text-gray-200 p-5 rounded-2xl rounded-tl-none max-w-[85%] shadow-lg w-full">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-accent text-xl">💡</span>
+                <h4 class="font-bold text-xs uppercase tracking-widest text-accent">Quick Quiz</h4>
+            </div>
+            <p class="mb-4 font-medium text-[15px]">${escapeHtml(question)}</p>
+            <div id="${optionsId}" class="space-y-2.5"></div>
+            <div id="${feedbackId}" class="mt-4 text-sm font-semibold p-3 rounded-xl hidden transition-all"></div>
+        </div>
+    `;
+
+    chatContainer.appendChild(quizDiv);
+    
+    const optionsContainer = document.getElementById(optionsId);
+    const feedbackDiv = document.getElementById(feedbackId);
 
     options.forEach(opt => {
         const btn = document.createElement('button');
-        btn.className = 'w-full text-left bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-2 rounded-lg text-sm transition-colors border border-gray-600';
+        btn.className = 'w-full text-left bg-gray-800 hover:bg-gray-700 text-gray-200 px-4 py-3 rounded-xl text-sm transition-colors border border-gray-700 focus:outline-none focus:ring-1 focus:ring-accent';
         btn.innerText = opt;
         
         btn.onclick = () => {
-            // Disable all buttons after guess
-            Array.from(optionsContainer.children).forEach(b => b.disabled = true);
+            Array.from(optionsContainer.children).forEach(b => {
+                b.disabled = true;
+                b.classList.remove('hover:bg-gray-700');
+                b.classList.add('opacity-70', 'cursor-not-allowed');
+            });
+            btn.classList.remove('opacity-70');
             
             if (opt === answer) {
-                btn.classList.add('bg-green-900', 'border-green-500', 'text-green-100');
-                btn.classList.remove('bg-gray-700', 'hover:bg-gray-600', 'text-gray-200');
+                btn.classList.add('bg-green-900/80', 'border-green-500', 'text-green-100');
+                btn.classList.remove('bg-gray-800', 'text-gray-200', 'border-gray-700');
                 feedbackDiv.innerText = '✅ Correct!';
-                feedbackDiv.classList.add('bg-green-900/50', 'text-green-400', 'border', 'border-green-800');
+                feedbackDiv.classList.add('bg-green-900/40', 'text-green-400', 'border', 'border-green-800/50');
                 feedbackDiv.classList.remove('hidden');
             } else {
-                btn.classList.add('bg-red-900', 'border-red-500', 'text-red-100');
-                btn.classList.remove('bg-gray-700', 'hover:bg-gray-600', 'text-gray-200');
-                feedbackDiv.innerText = `❌ Incorrect. The correct answer was: ${answer}`;
-                feedbackDiv.classList.add('bg-red-900/50', 'text-red-400', 'border', 'border-red-800');
+                btn.classList.add('bg-red-900/80', 'border-red-500', 'text-red-100');
+                btn.classList.remove('bg-gray-800', 'text-gray-200', 'border-gray-700');
+                feedbackDiv.innerText = `❌ Incorrect. The correct answer is: ${answer}`;
+                feedbackDiv.classList.add('bg-red-900/40', 'text-red-400', 'border', 'border-red-800/50');
                 feedbackDiv.classList.remove('hidden');
                 
                 // Highlight correct answer
                 Array.from(optionsContainer.children).forEach(b => {
                     if (b.innerText === answer) {
-                        b.classList.add('border-green-500', 'text-green-400');
+                        b.classList.add('border-green-500', 'text-green-400', 'border-2', 'opacity-100');
+                        b.classList.remove('opacity-70', 'border-gray-700');
                     }
                 });
             }
@@ -268,7 +312,33 @@ function renderQuiz(quizObject) {
         optionsContainer.appendChild(btn);
     });
 
-    quizContainer.classList.remove('hidden');
+    setTimeout(() => {
+        quizDiv.classList.remove('opacity-0');
+        quizDiv.classList.add('opacity-100');
+    }, 10);
+
+    scrollToBottom();
+}
+
+function renderTimeline(stepsArray) {
+    timelineContainer.innerHTML = '';
+
+    stepsArray.forEach((step, index) => {
+        const isLast = index === stepsArray.length - 1;
+        const stepDiv = document.createElement('div');
+        stepDiv.className = `relative pl-5 pb-4 timeline-item`;
+        stepDiv.style.animationDelay = `${index * 0.1}s`;
+        
+        if (!isLast) stepDiv.classList.add('border-l-2', 'border-accent');
+        else stepDiv.classList.add('border-l-2', 'border-transparent');
+
+        stepDiv.innerHTML = `
+            <div class="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-1 shadow-[0_0_8px_rgba(46,139,87,0.8)] border-2 border-card"></div>
+            <h3 class="text-sm font-semibold text-gray-200 mb-1">Step ${index + 1}</h3>
+            <p class="text-xs text-gray-400 leading-relaxed">${escapeHtml(step)}</p>
+        `;
+        timelineContainer.appendChild(stepDiv);
+    });
 }
 
 function appendLoadingIndicator() {

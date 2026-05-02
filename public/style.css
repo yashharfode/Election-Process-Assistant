@@ -1,6 +1,7 @@
 /* Custom scrollbar matching the theme */
 ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
 }
 ::-webkit-scrollbar-track {
     background: #121212; 
@@ -11,6 +12,15 @@
 }
 ::-webkit-scrollbar-thumb:hover {
     background: #246b43; 
+}
+
+/* Hide scrollbar for quick chips but keep scrollable */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 /* Basic Markdown typography styles for chat responses */
