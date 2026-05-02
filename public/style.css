@@ -1,39 +1,21 @@
-/* Custom scrollbar matching the theme */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #121212; 
-}
-::-webkit-scrollbar-thumb {
-    background: #2E8B57; 
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #246b43; 
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 
-/* Hide scrollbar for quick chips but keep scrollable */
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Basic Markdown typography styles for chat responses */
-.chat-message p { margin-bottom: 0.75rem; }
+.chat-message p { margin-bottom: 0.85rem; line-height: 1.6; }
 .chat-message p:last-child { margin-bottom: 0; }
-.chat-message ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.75rem; }
-.chat-message ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.75rem; }
-.chat-message strong { font-weight: 600; color: #fff; }
-.chat-message h1, .chat-message h2, .chat-message h3 { font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: #fff; }
-.chat-message code { background: #121212; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace; font-size: 0.875em; }
-.chat-message pre code { display: block; padding: 1rem; overflow-x: auto; margin-bottom: 0.75rem; }
+.chat-message ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.85rem; }
+.chat-message ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.85rem; }
+.chat-message li { margin-bottom: 0.25rem; }
+.chat-message strong { font-weight: 700; color: #fff; }
+.chat-message h1, .chat-message h2, .chat-message h3 { font-weight: bold; margin-top: 1.2rem; margin-bottom: 0.6rem; color: #fff; }
+.chat-message code { background: #121212; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace; font-size: 0.875em; border: 1px solid #374151; }
+.chat-message pre code { display: block; padding: 1rem; overflow-x: auto; margin-bottom: 0.85rem; }
 
-/* Mic recording pulse animation */
 @keyframes pulse-ring {
     0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
     70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
@@ -42,20 +24,24 @@
 
 .recording-active {
     animation: pulse-ring 1.5s infinite;
-    background-color: #ef4444 !important; /* Tailwind red-500 */
+    background-color: #ef4444 !important;
     color: white !important;
 }
 
-/* Timeline transition for dynamic items */
-.timeline-item {
-    opacity: 0;
-    transform: translateX(-10px);
-    animation: slideIn 0.3s forwards ease-out;
+.myth-active {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    border-color: #F59E0B !important;
+    color: #FBBF24 !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
 }
 
-@keyframes slideIn {
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
+.timeline-item { opacity: 0; transform: translateX(-10px); animation: slideIn 0.3s forwards ease-out; }
+@keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+
+/* ACCESSIBILITY: HIGH CONTRAST MODE */
+.high-contrast { font-size: 110%; }
+.high-contrast body, .high-contrast #app-body { background-color: #000000 !important; }
+.high-contrast .bg-card { background-color: #0A0A0A !important; border-color: #333 !important; }
+.high-contrast .bg-accent { background-color: #2E8B57 !important; color: #FFF !important; font-weight: 900 !important; }
+.high-contrast .text-accent { color: #2E8B57 !important; }
+.high-contrast .border-accent { border-color: #2E8B57 !important; }

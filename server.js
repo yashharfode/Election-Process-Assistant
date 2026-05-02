@@ -1,25 +1,40 @@
 require('dotenv').config();
 const express = require('express');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI, SchemaType } = require('@google/generative-ai');
 const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// 1. Initialize Google Generative AI
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
     console.error("CRITICAL ERROR: GEMINI_API_KEY is missing in your .env file.");
 }
 
-// Correct initialization using the API key
 const genAI = new GoogleGenerativeAI(apiKey);
 
-// Middleware to serve static files and parse JSON
+// Schema for forced JSON output
+const responseSchema = {
+    type: SchemaType.OBJECT,
+    properties: {
+        speechText: { type: SchemaType.STRING, description: "A short conversational summary (max 2 sentences)" },
+        timelineSteps: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: "Steps if process, else empty" },
+        quiz: {
+            type: SchemaType.OBJECT,
+            properties: {
+                question: { type: SchemaType.STRING },
+                options: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                answer: { type: SchemaType.STRING }
+            },
+            required: ["question", "options", "answer"]
+        }
+    },
+    required: ["speechText", "timelineSteps"] // quiz is optional
+};
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 3. Robust /api/chat Endpoint with Context Awareness
 app.post('/api/chat', async (req, res) => {
     const { message, context } = req.body;
 
@@ -27,76 +42,67 @@ app.post('/api/chat', async (req, res) => {
         return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Extract User Context (defaults if not provided)
-    const { name = 'User', age = 18, language = 'English' } = context || {};
+    const { name = 'Citizen', age = 18, language = 'English', state = 'General' } = context || {};
 
-    // 2. Dynamic System Prompt based on User Context
-    const systemInstruction = `You are an expert Election Assistant speaking to ${name}, age ${age}, in ${language}.
+    const systemInstruction = `You are an expert Election Assistant speaking to ${name}, age ${age}, from ${state}, in ${language}.
     If age < 18, focus on registration procedures and future voting readiness.
     If age >= 18, focus on the active voting process, polling details, and rights.
+    Keep in mind state-specific election guidelines for ${state}.
+    If the user asks to fact-check a claim, act as an authoritative Myth-Buster.
     
-    You MUST respond ONLY with a raw JSON object. 
-    Do not include markdown backticks (like \`\`\`json), do not include a preamble, and do not include any text after the JSON.
-    
-    The structure MUST be:
-    {
-      "speechText": "A short conversational summary written in ${language} (max 2 sentences)",
-      "timelineSteps": ["Step 1", "Step 2"], 
-      "quiz": { "question": "...", "options": ["...", "..."], "answer": "..." } or null
-    }
-    
-    Example output: {"speechText": "Voter registration is the first step.", "timelineSteps": ["Check eligibility", "Submit form"], "quiz": null}`;
+    You MUST respond with a JSON object containing "speechText" and "timelineSteps". An optional "quiz" object may be included.`;
 
     try {
-        // Initialize the model per-request to apply the dynamic system instruction
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash",
             systemInstruction: systemInstruction,
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: responseSchema,
+            }
         });
 
-        // --- CALL GEMINI API ---
         const result = await model.generateContent(message);
-        const response = await result.response;
-        const responseText = response.text();
+        const responseText = result.response.text();
 
-        // --- CLEAN THE RESPONSE ---
-        const cleanedText = responseText.replace(/```json|```/g, "").trim();
-
+        // Safe JSON Parsing
         try {
-            // --- STRICT JSON PARSING ---
+            const cleanedText = responseText.replace(/```json|```/g, "").trim();
             const jsonResponse = JSON.parse(cleanedText);
             return res.json(jsonResponse);
         } catch (parseError) {
-            // --- LOG FAILURE AND RETURN FALLBACK ---
-            console.error("--- JSON PARSE FAILED ---");
-            console.error("RAW STRING RECEIVED FROM GEMINI:");
-            console.error(responseText); 
-            console.error("ERROR MESSAGE:", parseError.message);
-            console.error("-------------------------");
-
+            console.error("--- JSON PARSE FAILED ---", parseError.message);
             return res.status(200).json({
-                speechText: `I'm sorry ${name}, I had trouble formatting that answer. Could you ask me in a different way?`,
+                speechText: `I apologize ${name}, I had trouble formatting that answer. Please try again.`,
                 timelineSteps: [],
-                quiz: null
+                quiz: null,
+                error: 'parse_error'
             });
         }
 
     } catch (apiError) {
-        // --- LOG API FAILURES (401, 429, etc.) ---
         console.error("--- GEMINI API CALL FAILED ---");
-        console.error(apiError.stack || apiError);
-        console.error("------------------------------");
+        console.error(apiError.stack || apiError.message);
+
+        // Catch Rate Limits explicitly
+        if (apiError.status === 429 || (apiError.message && apiError.message.includes('429'))) {
+            return res.status(200).json({
+                speechText: "I am receiving too many requests right now. Please wait a few seconds and try again.",
+                timelineSteps: [],
+                quiz: null,
+                error: 'rate_limit'
+            });
+        }
 
         return res.status(200).json({
-            speechText: `I'm having trouble connecting to my electoral database right now, ${name}. Please try again in a moment.`,
+            speechText: `I'm having trouble connecting to the secure electoral database right now, ${name}. Please try again in a moment.`,
             timelineSteps: [],
-            quiz: null
+            quiz: null,
+            error: 'server_error'
         });
     }
 });
 
-// Start the server
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
-    console.log("Ready to handle Context-Aware queries.");
 });

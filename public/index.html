@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Election Process Assistant</title>
-    <!-- Tailwind CSS CDN -->
+    <title>GovPortal: Election Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -14,7 +13,8 @@
                         background: '#121212',
                         card: '#1A1A1A',
                         accent: '#2E8B57',
-                        accentHover: '#246b43'
+                        accentHover: '#246b43',
+                        mythbuster: '#F59E0B'
                     }
                 }
             }
@@ -22,114 +22,127 @@
     </script>
     <link rel="stylesheet" href="/style.css">
 </head>
-<body class="bg-background text-gray-200 h-screen font-sans flex overflow-hidden">
+<body class="bg-background text-gray-200 h-screen font-sans flex overflow-hidden transition-all duration-300" id="app-body">
 
     <!-- ONBOARDING MODAL -->
-    <div id="onboarding-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300">
-        <div class="bg-card border border-accent rounded-2xl p-8 w-full max-w-md shadow-[0_0_40px_rgba(46,139,87,0.15)] transform transition-transform duration-300 scale-100">
-            <div class="flex items-center gap-3 mb-6 justify-center">
-                <div class="w-2 h-8 bg-accent rounded-sm shadow-[0_0_10px_rgba(46,139,87,0.5)]"></div>
-                <h2 class="text-2xl font-bold tracking-wide text-white">Welcome</h2>
+    <div id="onboarding-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center transition-opacity duration-300">
+        <div class="bg-card border border-gray-800 rounded-2xl p-8 w-full max-w-lg shadow-[0_0_50px_rgba(46,139,87,0.1)] transform transition-transform duration-300 scale-100">
+            <div class="flex items-center gap-3 mb-2 justify-center">
+                <div class="w-2 h-8 bg-accent rounded-sm shadow-[0_0_15px_rgba(46,139,87,0.6)]"></div>
+                <h2 class="text-3xl font-bold tracking-wide text-white">GovPortal</h2>
             </div>
-            <p class="text-gray-400 text-sm text-center mb-8">Personalize your election assistant experience.</p>
+            <p class="text-gray-400 text-sm text-center mb-8 font-medium tracking-wide">Secure Electoral Assistance Platform</p>
             
-            <form id="onboarding-form" class="space-y-5">
-                <div>
-                    <label for="user-name" class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Name</label>
-                    <input type="text" id="user-name" required class="w-full bg-background border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. Rahul">
+            <form id="onboarding-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="user-name" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Name</label>
+                        <input type="text" id="user-name" required class="w-full bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. Rahul">
+                    </div>
+                    <div>
+                        <label for="user-age" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Age</label>
+                        <input type="number" id="user-age" required min="1" max="120" class="w-full bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. 21">
+                    </div>
                 </div>
-                <div>
-                    <label for="user-age" class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Age</label>
-                    <input type="number" id="user-age" required min="1" max="120" class="w-full bg-background border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. 21">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="user-lang" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">Language</label>
+                        <select id="user-lang" class="w-full bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all appearance-none cursor-pointer">
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="Marathi">Marathi</option>
+                            <option value="Tamil">Tamil</option>
+                            <option value="Kannada">Kannada</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="user-state" class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest">State / Region</label>
+                        <input type="text" id="user-state" required class="w-full bg-[#121212] border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-600" placeholder="e.g. Maharashtra">
+                    </div>
                 </div>
-                <div>
-                    <label for="user-lang" class="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">Language</label>
-                    <select id="user-lang" class="w-full bg-background border border-gray-700 text-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all appearance-none cursor-pointer">
-                        <option value="English">English</option>
-                        <option value="Hindi">Hindi</option>
-                        <option value="Marathi">Marathi</option>
-                        <option value="Tamil">Tamil</option>
-                        <option value="Kannada">Kannada</option>
-                    </select>
+                
+                <div class="pt-2 pb-1">
+                    <label class="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-700 bg-[#121212] hover:bg-gray-800 transition-colors">
+                        <input type="checkbox" id="user-accessibility" class="w-5 h-5 accent-accent bg-gray-700 border-gray-600 rounded cursor-pointer">
+                        <span class="text-sm font-medium text-gray-200">I need Accessibility Support<br><span class="text-[11px] text-gray-500 font-normal">Enables High Contrast & Auto-Voice</span></span>
+                    </label>
                 </div>
-                <button type="submit" class="w-full bg-accent hover:bg-accentHover text-white font-semibold py-3.5 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-lg shadow-accent/20 mt-4">
-                    Start Dashboard
+
+                <button type="submit" class="w-full bg-accent hover:bg-accentHover text-white font-bold tracking-wide py-4 rounded-xl transition-all transform hover:-translate-y-0.5 shadow-[0_0_20px_rgba(46,139,87,0.3)] mt-2">
+                    Access Portal
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Main Layout Container (Hidden initially) -->
+    <!-- Main Layout Container -->
     <div id="main-dashboard" class="flex w-full h-full p-4 gap-4 max-w-7xl mx-auto relative hidden opacity-0 transition-opacity duration-500">
         
         <!-- Sidebar: Election Timeline -->
-        <div class="w-1/3 md:w-1/4 bg-card rounded-2xl p-6 flex flex-col shadow-xl border border-gray-800 transition-all">
+        <div class="w-1/3 md:w-1/4 bg-card rounded-2xl p-6 flex flex-col shadow-2xl border border-gray-800/60 transition-all">
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-3 h-8 bg-accent rounded-sm shadow-[0_0_10px_rgba(46,139,87,0.5)]"></div>
-                <h2 class="text-xl font-bold tracking-wide text-white">Election Timeline</h2>
+                <h2 class="text-xl font-bold tracking-wide text-white">Election Flow</h2>
             </div>
             
             <div id="timeline-container" class="flex-1 overflow-y-auto pr-2 space-y-6">
-                <!-- Dynamically populated timeline steps will go here -->
-                <p class="text-gray-500 text-sm italic">Ask about an election process to see the steps here.</p>
+                <div class="flex flex-col items-center justify-center h-full text-center opacity-50">
+                    <span class="text-4xl mb-3">📍</span>
+                    <p class="text-sm font-medium">Your timeline will appear here based on your queries.</p>
+                </div>
             </div>
         </div>
 
         <!-- Main Content: Chat Window -->
-        <div class="flex-1 bg-card rounded-2xl flex flex-col shadow-xl border border-gray-800 transition-all relative overflow-hidden">
+        <div class="flex-1 bg-card rounded-2xl flex flex-col shadow-2xl border border-gray-800/60 transition-all relative overflow-hidden">
             
             <!-- Header -->
-            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-card rounded-t-2xl z-10 shadow-sm relative">
+            <div class="p-5 border-b border-gray-800/60 flex justify-between items-center bg-card rounded-t-2xl z-10 relative">
                 <div>
-                    <h1 class="text-2xl font-bold text-white tracking-wide flex items-center gap-3">
-                        Election Process Assistant
+                    <h1 class="text-xl font-bold text-white tracking-wide flex items-center gap-2">
+                        <span class="bg-accent text-background text-xs px-2 py-0.5 rounded uppercase tracking-bold mr-1">Gov</span>
+                        Electoral Assistant
                     </h1>
-                    <p id="header-greeting" class="text-sm text-gray-400 mt-1.5">Ask me anything about electoral procedures.</p>
+                    <p id="header-greeting" class="text-xs text-gray-400 mt-1 font-medium tracking-wide">Secure Connection Established.</p>
                 </div>
-                <div class="flex items-center gap-5">
+                <div class="flex items-center gap-4">
+                    <!-- MythBuster Toggle -->
+                    <button id="myth-toggle" class="flex items-center gap-2 border border-gray-700 bg-[#121212] hover:bg-gray-800 text-gray-300 px-3 py-1.5 rounded-full text-xs font-bold transition-all focus:outline-none">
+                        <span>🔍</span> MythBuster Mode
+                    </button>
                     <!-- Volume Toggle -->
-                    <button id="volume-toggle" class="text-gray-400 hover:text-white transition-colors text-2xl focus:outline-none focus:ring-2 focus:ring-accent rounded-full p-1" title="Disable Voice">
+                    <button id="volume-toggle" class="text-gray-400 hover:text-white transition-colors text-xl focus:outline-none rounded-full p-1" title="Disable Voice">
                         🔊
                     </button>
-                    <div class="flex items-center gap-2 bg-background px-3 py-1.5 rounded-full border border-gray-800">
-                        <span class="relative flex h-2.5 w-2.5">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent"></span>
-                        </span>
-                        <span class="text-xs text-accent font-semibold tracking-wider">SYSTEM ONLINE</span>
-                    </div>
                 </div>
             </div>
 
             <!-- Chat Area -->
-            <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6">
-                <!-- Messages will be dynamically injected here -->
-            </div>
+            <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6"></div>
 
             <!-- Input Area -->
-            <div class="p-5 border-t border-gray-800 bg-card rounded-b-2xl flex flex-col gap-3">
-                <!-- Quick Action Chips -->
+            <div class="p-5 border-t border-gray-800/60 bg-card rounded-b-2xl flex flex-col gap-3">
+                <!-- Real-World Quick Action Chips -->
                 <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="quick-chips">
-                    <button class="quick-chip shrink-0 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-xs px-4 py-2 rounded-full transition-colors whitespace-nowrap focus:outline-none focus:ring-1 focus:ring-accent">How to get Voter ID?</button>
-                    <button class="quick-chip shrink-0 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-xs px-4 py-2 rounded-full transition-colors whitespace-nowrap focus:outline-none focus:ring-1 focus:ring-accent">What is an EVM?</button>
-                    <button class="quick-chip shrink-0 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-xs px-4 py-2 rounded-full transition-colors whitespace-nowrap focus:outline-none focus:ring-1 focus:ring-accent">Explain Election Phases</button>
-                    <button class="quick-chip shrink-0 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-xs px-4 py-2 rounded-full transition-colors whitespace-nowrap focus:outline-none focus:ring-1 focus:ring-accent">Am I eligible to vote?</button>
+                    <button class="quick-chip shrink-0 bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-xs font-medium px-4 py-2.5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Lost Voter ID</button>
+                    <button class="quick-chip shrink-0 bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-xs font-medium px-4 py-2.5 rounded-full transition-colors whitespace-nowrap focus:outline-none">EVM Walkthrough</button>
+                    <button class="quick-chip shrink-0 bg-[#121212] hover:bg-gray-800 border border-gray-700 text-gray-300 text-xs font-medium px-4 py-2.5 rounded-full transition-colors whitespace-nowrap focus:outline-none">Check Voter List</button>
                 </div>
 
                 <form id="chat-form" class="relative flex items-center gap-3">
                     <!-- Mic Button -->
                     <button type="button" id="mic-button" title="Click to speak"
-                        class="bg-gray-700 hover:bg-gray-600 text-white w-14 h-14 rounded-full transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-accent flex-shrink-0 shadow-lg">
+                        class="bg-gray-700 hover:bg-gray-600 text-white w-[52px] h-[52px] rounded-full transition-all flex items-center justify-center focus:outline-none flex-shrink-0 shadow-lg">
                         <span class="text-xl">🎤</span>
                     </button>
 
                     <!-- Text Input & Send Button -->
                     <div class="relative flex-1">
                         <input type="text" id="user-input" 
-                            class="w-full bg-background border border-gray-700 text-gray-100 rounded-full pl-6 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-500 shadow-inner"
-                            placeholder="Type your message here..." autocomplete="off">
+                            class="w-full bg-[#121212] border border-gray-700 text-gray-100 rounded-full pl-6 pr-14 py-4 focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent transition-all placeholder-gray-500 shadow-inner"
+                            placeholder="Describe your issue or ask a question..." autocomplete="off">
                         <button type="submit" id="send-button"
-                            class="absolute right-2 top-1.5 bottom-1.5 bg-accent hover:bg-accentHover text-white w-10 h-10 rounded-full transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105">
+                            class="absolute right-2 top-1.5 bottom-1.5 bg-accent hover:bg-accentHover text-white w-11 h-11 rounded-full transition-all flex items-center justify-center focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-[0_0_10px_rgba(46,139,87,0.4)]">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-0.5" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                             </svg>
@@ -141,7 +154,6 @@
         </div>
     </div>
 
-    <!-- Include marked.js for parsing markdown in AI responses -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="/script.js"></script>
 </body>
