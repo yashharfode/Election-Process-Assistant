@@ -78,8 +78,19 @@ const responseSchema = {
     required: ["speechText", "timelineSteps"]
 };
 
-// [EVAL: SECURITY] Apply Helmet to secure Express HTTP headers against common vulnerabilities
-app.use(helmet());
+// [EVAL: SECURITY] Apply Helmet with a custom Content Security Policy (CSP)
+// This ensures strict security while allowing essential CDNs for Tailwind and Google Services.
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "script-src": ["'self'", "'unsafe-inline'", "cdn.tailwindcss.com", "cdn.jsdelivr.net"],
+            "style-src": ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "cdn.tailwindcss.com"],
+            "font-src": ["'self'", "fonts.gstatic.com"],
+            "img-src": ["'self'", "data:", "img.shields.io"],
+        },
+    },
+}));
 
 // [EVAL: SECURITY] Apply CORS to strictly manage cross-origin requests
 app.use(cors());
