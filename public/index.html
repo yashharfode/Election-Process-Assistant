@@ -20,36 +20,13 @@
             }
         }
     </script>
-    <style>
-        /* Custom scrollbar matching the theme */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #121212; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2E8B57; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #246b43; 
-        }
-        /* Basic Markdown typography styles for chat responses */
-        .chat-message p { margin-bottom: 0.75rem; }
-        .chat-message p:last-child { margin-bottom: 0; }
-        .chat-message ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.75rem; }
-        .chat-message ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.75rem; }
-        .chat-message strong { font-weight: 600; color: #fff; }
-        .chat-message h1, .chat-message h2, .chat-message h3 { font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: #fff; }
-        .chat-message code { background: #121212; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace; font-size: 0.875em; }
-        .chat-message pre code { display: block; padding: 1rem; overflow-x: auto; margin-bottom: 0.75rem; }
-    </style>
+    <!-- Link the extracted stylesheet -->
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body class="bg-background text-gray-200 h-screen font-sans flex overflow-hidden">
 
     <!-- Main Layout Container -->
-    <div class="flex w-full h-full p-4 gap-4 max-w-7xl mx-auto">
+    <div class="flex w-full h-full p-4 gap-4 max-w-7xl mx-auto relative">
         
         <!-- Sidebar: Election Timeline -->
         <div class="w-1/3 md:w-1/4 bg-card rounded-2xl p-6 flex flex-col shadow-xl border border-gray-800 transition-all">
@@ -58,38 +35,14 @@
                 <h2 class="text-xl font-bold tracking-wide text-white">Election Timeline</h2>
             </div>
             
-            <div class="flex-1 overflow-y-auto pr-2 space-y-6">
-                <!-- Timeline items -->
-                <div class="relative border-l-2 border-accent pl-5 pb-4">
-                    <div class="absolute w-4 h-4 bg-accent rounded-full -left-[9px] top-1 shadow-[0_0_8px_rgba(46,139,87,0.8)] border-2 border-card"></div>
-                    <h3 class="text-sm font-semibold text-accent mb-1">Phase 1: Voter Registration</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Enrollment of new voters and updating of electoral rolls. Verification of eligibility.</p>
-                </div>
-                <div class="relative border-l-2 border-gray-700 pl-5 pb-4">
-                    <div class="absolute w-4 h-4 bg-gray-600 rounded-full -left-[9px] top-1 border-2 border-card"></div>
-                    <h3 class="text-sm font-semibold text-gray-300 mb-1">Phase 2: Nominations</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Candidates file their nomination papers. Scrutiny of nominations and withdrawal period.</p>
-                </div>
-                <div class="relative border-l-2 border-gray-700 pl-5 pb-4">
-                    <div class="absolute w-4 h-4 bg-gray-600 rounded-full -left-[9px] top-1 border-2 border-card"></div>
-                    <h3 class="text-sm font-semibold text-gray-300 mb-1">Phase 3: Campaigning</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Official campaign period begins. Rallies, manifestos, and public outreach.</p>
-                </div>
-                <div class="relative border-l-2 border-gray-700 pl-5 pb-4">
-                    <div class="absolute w-4 h-4 bg-gray-600 rounded-full -left-[9px] top-1 border-2 border-card"></div>
-                    <h3 class="text-sm font-semibold text-gray-300 mb-1">Phase 4: Polling Day</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Voters cast their ballots at designated polling stations under strict security.</p>
-                </div>
-                <div class="relative pl-5 pb-4">
-                    <div class="absolute w-4 h-4 bg-gray-600 rounded-full -left-[9px] top-1 border-2 border-card"></div>
-                    <h3 class="text-sm font-semibold text-gray-300 mb-1">Phase 5: Results</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">Counting of votes and official declaration of the election results.</p>
-                </div>
+            <div id="timeline-container" class="flex-1 overflow-y-auto pr-2 space-y-6">
+                <!-- Dynamically populated timeline steps will go here -->
+                <p class="text-gray-500 text-sm italic">Ask about an election process to see the steps here.</p>
             </div>
         </div>
 
         <!-- Main Content: Chat Window -->
-        <div class="flex-1 bg-card rounded-2xl flex flex-col shadow-xl border border-gray-800 transition-all">
+        <div class="flex-1 bg-card rounded-2xl flex flex-col shadow-xl border border-gray-800 transition-all relative">
             
             <!-- Header -->
             <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-card rounded-t-2xl z-10 shadow-sm">
@@ -108,28 +61,48 @@
                 </div>
             </div>
 
+            <!-- Quiz Container (Floating Widget) -->
+            <div id="quiz-container" class="hidden absolute top-24 right-6 bg-gray-800 border border-accent rounded-xl p-4 shadow-2xl z-20 w-80">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-accent font-bold text-sm uppercase tracking-wider">Knowledge Check</h3>
+                    <button id="close-quiz" class="text-gray-400 hover:text-white">&times;</button>
+                </div>
+                <p id="quiz-question" class="text-sm text-white mb-3 font-medium"></p>
+                <div id="quiz-options" class="space-y-2"></div>
+                <div id="quiz-feedback" class="mt-3 text-xs hidden"></div>
+            </div>
+
             <!-- Chat Area -->
             <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-6">
                 <!-- Welcome Message -->
                 <div class="flex justify-start">
                     <div class="bg-gray-800/80 text-gray-200 px-6 py-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-md border border-gray-700 backdrop-blur-sm">
-                        <p>Hello! I am your AI Election Process Assistant powered by Google Gemini. How can I help you understand the election timeline or procedures today?</p>
+                        <p>Hello! I am your AI Election Process Assistant. I can now speak out loud and listen to your questions! Click the microphone to start talking.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Input Area -->
             <div class="p-5 border-t border-gray-800 bg-card rounded-b-2xl">
-                <form id="chat-form" class="relative flex items-center">
-                    <input type="text" id="user-input" 
-                        class="w-full bg-background border border-gray-700 text-gray-100 rounded-full pl-6 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-500 shadow-inner"
-                        placeholder="Type your message here..." autocomplete="off">
-                    <button type="submit" id="send-button"
-                        class="absolute right-2 bg-accent hover:bg-accentHover text-white p-2.5 rounded-full transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-0.5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                        </svg>
+                <form id="chat-form" class="relative flex items-center gap-3">
+                    <!-- Mic Button -->
+                    <button type="button" id="mic-button" title="Click to speak"
+                        class="bg-gray-700 hover:bg-gray-600 text-white w-14 h-14 rounded-full transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-accent flex-shrink-0">
+                        <span class="text-xl">🎤</span>
                     </button>
+
+                    <!-- Text Input & Send Button -->
+                    <div class="relative flex-1">
+                        <input type="text" id="user-input" 
+                            class="w-full bg-background border border-gray-700 text-gray-100 rounded-full pl-6 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all placeholder-gray-500 shadow-inner"
+                            placeholder="Type your message here..." autocomplete="off">
+                        <button type="submit" id="send-button"
+                            class="absolute right-2 top-1.5 bottom-1.5 bg-accent hover:bg-accentHover text-white w-10 h-10 rounded-full transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-0.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                            </svg>
+                        </button>
+                    </div>
                 </form>
             </div>
 
