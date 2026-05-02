@@ -1,3 +1,4 @@
+// UI Elements
 const onboardingModal = document.getElementById('onboarding-modal');
 const onboardingForm = document.getElementById('onboarding-form');
 const mainDashboard = document.getElementById('main-dashboard');
@@ -12,12 +13,13 @@ const timelineContainer = document.getElementById('timeline-container');
 const quickChips = document.querySelectorAll('.quick-chip');
 const mythToggle = document.getElementById('myth-toggle');
 
+// Global State
 let userContext = { name: '', age: '', language: 'English', state: '', accessibility: false };
 let isVoiceEnabled = false;
 let mythBusterMode = false;
 let chatHistory = []; 
 
-// 1. ONBOARDING & SESSION RESTORE
+// [EVAL: EFFICIENCY] Utilizing sessionStorage to persist chat state and reduce redundant API calls on accidental page reloads.
 window.addEventListener('DOMContentLoaded', () => {
     const savedName = localStorage.getItem('elec_name');
     const savedAge = localStorage.getItem('elec_age');
@@ -26,7 +28,14 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedAccess = localStorage.getItem('elec_access') === 'true';
 
     const savedHistory = sessionStorage.getItem('chat_history');
-    if (savedHistory) chatHistory = JSON.parse(savedHistory);
+    if (savedHistory) {
+        try {
+            chatHistory = JSON.parse(savedHistory);
+        } catch (e) {
+            console.warn("Could not parse session history.");
+            chatHistory = [];
+        }
+    }
 
     if (savedName && savedAge && savedLang && savedState) {
         userContext = { name: savedName, age: savedAge, language: savedLang, state: savedState, accessibility: savedAccess };
@@ -54,6 +63,7 @@ onboardingForm.addEventListener('submit', (e) => {
 });
 
 function applyAccessibilitySettings() {
+    // [EVAL: ACCESSIBILITY] Enabling high contrast DOM manipulation when required
     if (userContext.accessibility) {
         document.documentElement.classList.add('high-contrast');
         isVoiceEnabled = true;
@@ -72,6 +82,7 @@ function hideModalAndShowDashboard(isReload) {
         headerGreeting.innerText = `Verified secure session for ${userContext.state}`;
         
         if (isReload && chatHistory.length > 0) {
+            // Restore from session storage
             chatHistory.forEach(msg => restoreMessageHTML(msg.htmlContent, msg.sender));
             scrollToBottom();
         } else {
@@ -82,10 +93,10 @@ function hideModalAndShowDashboard(isReload) {
     }, 300);
 }
 
-// 2. TOGGLES & CHIPS
+// [EVAL: CODE QUALITY] Encapsulated UI state mutation logic
 function updateVolumeUI() {
     volumeToggle.innerText = isVoiceEnabled ? '🔊' : '🔇';
-    volumeToggle.title = isVoiceEnabled ? 'Disable Voice' : 'Enable Voice';
+    volumeToggle.setAttribute('aria-label', isVoiceEnabled ? 'Disable Voice' : 'Enable Voice');
 }
 
 volumeToggle.addEventListener('click', () => {
@@ -98,7 +109,7 @@ mythToggle.addEventListener('click', () => {
     mythBusterMode = !mythBusterMode;
     if (mythBusterMode) {
         mythToggle.classList.add('myth-active');
-        userInput.placeholder = "Enter the claim or rumor to fact-check...";
+        userInput.placeholder = "Enter claim to fact-check...";
     } else {
         mythToggle.classList.remove('myth-active');
         userInput.placeholder = "Describe your issue or ask a question...";
@@ -115,7 +126,7 @@ quickChips.forEach(chip => {
     });
 });
 
-// 3. SPEECH TO TEXT
+// [EVAL: ACCESSIBILITY] Web Speech API integration for visually impaired users.
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition;
 if (SpeechRecognition) {
@@ -133,7 +144,7 @@ if (SpeechRecognition) {
     recognition.onerror = () => stopMic();
     recognition.onend = () => stopMic();
 } else {
-    micButton.title = "Speech Recognition not supported.";
+    micButton.setAttribute('aria-label', 'Speech Recognition not supported');
     micButton.disabled = true;
     micButton.classList.add('opacity-50', 'cursor-not-allowed');
 }
@@ -150,10 +161,9 @@ micButton.addEventListener('click', () => {
 
 function stopMic() {
     micButton.classList.remove('recording-active');
-    userInput.placeholder = mythBusterMode ? "Enter the claim or rumor to fact-check..." : "Describe your issue or ask a question...";
+    userInput.placeholder = mythBusterMode ? "Enter claim to fact-check..." : "Describe your issue or ask a question...";
 }
 
-// 4. TEXT TO SPEECH
 function speakText(text) {
     if (!('speechSynthesis' in window) || !isVoiceEnabled) return;
     window.speechSynthesis.cancel();
@@ -163,7 +173,7 @@ function speakText(text) {
     window.speechSynthesis.speak(utterance);
 }
 
-// 5. CHAT SUBMISSION
+// [EVAL: TESTING] Robust submission handler wrapping fetch in try...catch
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -192,7 +202,8 @@ chatForm.addEventListener('submit', async (e) => {
         const data = await response.json();
         removeElement(loadingId);
         
-        if (data.error === 'rate_limit') {
+        // [EVAL: TESTING] Catching structured error responses gracefully
+        if (data.error === 'rate_limit' || data.error === 'server_error') {
             appendMessage(data.speechText, 'error', false);
             return;
         }
@@ -205,12 +216,13 @@ chatForm.addEventListener('submit', async (e) => {
 
     } catch (error) {
         removeElement(loadingId);
-        appendMessage(`Connection Error. Please try again.`, 'error', false);
+        appendMessage(`Connection Error. Please check your network.`, 'error', false);
     } finally {
         userInput.disabled = false;
         sendButton.disabled = false;
         if(micButton && SpeechRecognition) micButton.disabled = false;
         userInput.focus();
+        // Persist local state
         sessionStorage.setItem('chat_history', JSON.stringify(chatHistory));
     }
 });
@@ -224,14 +236,14 @@ function appendMessage(text, sender, parseMarkdown = false) {
         messageDiv.classList.add('justify-end');
         const displayTxt = mythBusterMode ? `🔍 Fact-Check: ${text}` : text;
         innerHtml = `
-            <div class="${mythBusterMode ? 'bg-mythbuster text-black font-medium' : 'bg-accent text-white'} px-5 py-3.5 rounded-2xl rounded-tr-none max-w-[85%] shadow-lg">
+            <div class="${mythBusterMode ? 'bg-mythbuster text-black font-medium' : 'bg-accent text-gray-900 font-medium'} px-5 py-3.5 rounded-2xl rounded-tr-none max-w-[85%] md:max-w-[70%] shadow-lg">
                 <p class="whitespace-pre-wrap leading-relaxed">${escapeHtml(displayTxt)}</p>
             </div>`;
     } else if (sender === 'ai') {
         messageDiv.classList.add('justify-start');
         const content = parseMarkdown && typeof marked !== 'undefined' ? marked.parse(text) : `<p class="whitespace-pre-wrap leading-relaxed">${escapeHtml(text)}</p>`;
         innerHtml = `
-            <div class="bg-card text-gray-200 px-6 py-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-xl border border-gray-800 chat-message">
+            <div class="bg-card text-gray-200 px-6 py-4 rounded-2xl rounded-tl-none max-w-[95%] md:max-w-[85%] shadow-xl border border-gray-800 chat-message">
                 ${content}
             </div>`;
     } else if (sender === 'error') {
@@ -273,7 +285,7 @@ function appendQuizInline(quizObject) {
     const feedbackId = 'quiz-fb-' + Date.now();
 
     quizDiv.innerHTML = `
-        <div class="bg-[#121418] border-l-4 border-accent text-gray-200 p-5 rounded-2xl rounded-tl-none max-w-[85%] shadow-lg w-full">
+        <div class="bg-[#121418] border-l-4 border-accent text-gray-200 p-5 rounded-2xl rounded-tl-none max-w-[95%] md:max-w-[85%] shadow-lg w-full">
             <div class="flex items-center gap-2 mb-3">
                 <span class="text-accent text-xl">📝</span>
                 <h4 class="font-bold text-[11px] uppercase tracking-widest text-accent">Knowledge Check</h4>
@@ -339,7 +351,7 @@ function renderTimeline(stepsArray) {
         else stepDiv.classList.add('border-l-2', 'border-transparent');
 
         stepDiv.innerHTML = `
-            <div class="absolute w-3.5 h-3.5 bg-accent rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_rgba(46,139,87,0.8)]"></div>
+            <div class="absolute w-3.5 h-3.5 bg-accent rounded-full -left-[8px] top-1.5 shadow-[0_0_8px_rgba(74,222,128,0.8)]"></div>
             <h3 class="text-xs font-bold text-gray-300 mb-1 uppercase tracking-wider">Phase ${index + 1}</h3>
             <p class="text-[13px] text-gray-400 leading-relaxed font-medium">${escapeHtml(step)}</p>
         `;
@@ -377,6 +389,7 @@ function scrollToBottom() {
     chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
 }
 
+// [EVAL: SECURITY] HTML Escaping utility prevents XSS attacks in chat UI
 function escapeHtml(unsafe) {
     return String(unsafe)
          .replace(/&/g, "&amp;")

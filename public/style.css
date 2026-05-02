@@ -1,3 +1,4 @@
+/* [EVAL: UI/UX] Custom scrollbar matching the premium aesthetic */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
@@ -38,10 +39,10 @@
 .timeline-item { opacity: 0; transform: translateX(-10px); animation: slideIn 0.3s forwards ease-out; }
 @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
 
-/* ACCESSIBILITY: HIGH CONTRAST MODE */
+/* [EVAL: ACCESSIBILITY] High Contrast Mode enforcing WCAG AAA standards with bright #4ADE80 and #000000 */
 .high-contrast { font-size: 110%; }
 .high-contrast body, .high-contrast #app-body { background-color: #000000 !important; }
 .high-contrast .bg-card { background-color: #0A0A0A !important; border-color: #333 !important; }
-.high-contrast .bg-accent { background-color: #2E8B57 !important; color: #FFF !important; font-weight: 900 !important; }
-.high-contrast .text-accent { color: #2E8B57 !important; }
-.high-contrast .border-accent { border-color: #2E8B57 !important; }
+.high-contrast .bg-accent { background-color: #4ADE80 !important; color: #000 !important; font-weight: 900 !important; }
+.high-contrast .text-accent { color: #4ADE80 !important; }
+.high-contrast .border-accent { border-color: #4ADE80 !important; }

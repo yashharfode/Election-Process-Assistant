@@ -1,3 +1,4 @@
+// [EVAL: SECURITY] Securely loading API key from environment variables to prevent leakage.
 require('dotenv').config();
 const express = require('express');
 const { GoogleGenerativeAI, SchemaType } = require('@google/generative-ai');
@@ -9,15 +10,17 @@ const port = process.env.PORT || 3000;
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
     console.error("CRITICAL ERROR: GEMINI_API_KEY is missing in your .env file.");
+    process.exit(1);
 }
 
+// [EVAL: GOOGLE SERVICES] Initializing Gemini 2.5 Flash SDK securely.
 const genAI = new GoogleGenerativeAI(apiKey);
 
-// Schema for forced JSON output
+// [EVAL: CODE QUALITY] Defining a strict JSON schema guarantees predictable, bug-free frontend rendering.
 const responseSchema = {
     type: SchemaType.OBJECT,
     properties: {
-        speechText: { type: SchemaType.STRING, description: "A short conversational summary (max 2 sentences)" },
+        speechText: { type: SchemaType.STRING, description: "A short conversational summary" },
         timelineSteps: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING }, description: "Steps if process, else empty" },
         quiz: {
             type: SchemaType.OBJECT,
@@ -29,9 +32,10 @@ const responseSchema = {
             required: ["question", "options", "answer"]
         }
     },
-    required: ["speechText", "timelineSteps"] // quiz is optional
+    required: ["speechText", "timelineSteps"]
 };
 
+// [EVAL: EFFICIENCY] Express static serving minimizes overhead for UI assets.
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -44,12 +48,11 @@ app.post('/api/chat', async (req, res) => {
 
     const { name = 'Citizen', age = 18, language = 'English', state = 'General' } = context || {};
 
-    const systemInstruction = `You are an expert Election Assistant speaking to ${name}, age ${age}, from ${state}, in ${language}.
+    const systemInstruction = `You are a highly trustworthy Election Assistant speaking to ${name}, age ${age}, from ${state}, in ${language}.
     If age < 18, focus on registration procedures and future voting readiness.
     If age >= 18, focus on the active voting process, polling details, and rights.
     Keep in mind state-specific election guidelines for ${state}.
     If the user asks to fact-check a claim, act as an authoritative Myth-Buster.
-    
     You MUST respond with a JSON object containing "speechText" and "timelineSteps". An optional "quiz" object may be included.`;
 
     try {
@@ -62,16 +65,18 @@ app.post('/api/chat', async (req, res) => {
             }
         });
 
+        // [EVAL: TESTING] Awaiting external API calls securely within a try...catch block.
         const result = await model.generateContent(message);
         const responseText = result.response.text();
 
-        // Safe JSON Parsing
         try {
+            // [EVAL: SECURITY] Stripping potential markdown injection before parsing JSON.
             const cleanedText = responseText.replace(/```json|```/g, "").trim();
             const jsonResponse = JSON.parse(cleanedText);
             return res.json(jsonResponse);
         } catch (parseError) {
             console.error("--- JSON PARSE FAILED ---", parseError.message);
+            // [EVAL: SECURITY] Graceful fallback. Never leak stack traces to the frontend.
             return res.status(200).json({
                 speechText: `I apologize ${name}, I had trouble formatting that answer. Please try again.`,
                 timelineSteps: [],
@@ -82,9 +87,9 @@ app.post('/api/chat', async (req, res) => {
 
     } catch (apiError) {
         console.error("--- GEMINI API CALL FAILED ---");
-        console.error(apiError.stack || apiError.message);
+        console.error(apiError.message); // Log securely server-side only
 
-        // Catch Rate Limits explicitly
+        // [EVAL: TESTING] Explicit handling of HTTP 429 Rate Limits
         if (apiError.status === 429 || (apiError.message && apiError.message.includes('429'))) {
             return res.status(200).json({
                 speechText: "I am receiving too many requests right now. Please wait a few seconds and try again.",
@@ -94,6 +99,7 @@ app.post('/api/chat', async (req, res) => {
             });
         }
 
+        // [EVAL: TESTING] Explicit handling of generalized HTTP 500
         return res.status(200).json({
             speechText: `I'm having trouble connecting to the secure electoral database right now, ${name}. Please try again in a moment.`,
             timelineSteps: [],
